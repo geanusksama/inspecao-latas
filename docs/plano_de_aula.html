@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Como Ensinar Inspeção Visual Automática de Qualidade com Edge AI – Plano de Aula</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  :root { --azul: #1d4ed8; --azul-claro: #e8efff; --cinza: #5b6474; --borda: #d9dee8; --laranja: #b45309; }
+  * { box-sizing: border-box; }
+  body { font: 10.3pt/1.45 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #1c2230; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 2mm; color: #0f1b3d; letter-spacing: -.01em; }
+  h2 { font-size: 13pt; color: var(--azul); margin: 7mm 0 2.5mm; padding-bottom: 1.2mm; border-bottom: 1.5px solid var(--azul-claro); page-break-after: avoid; }
+  h3 { font-size: 10.8pt; margin: 4mm 0 1.5mm; page-break-after: avoid; }
+  p { margin: 0 0 2.2mm; }
+  ul, ol { margin: 0 0 2.5mm; padding-left: 5.5mm; }
+  li { margin-bottom: .8mm; }
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.3pt; page-break-inside: auto; }
+  tr { page-break-inside: avoid; }
+  th { background: var(--azul-claro); color: #0f1b3d; text-align: left; font-weight: 600; }
+  th, td { border: 1px solid var(--borda); padding: 1.6mm 2mm; vertical-align: top; }
+  .capa { border-left: 5px solid var(--azul); padding: 2mm 0 2mm 5mm; margin-bottom: 5mm; }
+  .sub { color: var(--cinza); font-size: 11pt; margin: 0; }
+  .ficha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm; margin: 4mm 0; }
+  .ficha div { background: #f6f8fc; border: 1px solid var(--borda); border-radius: 2mm; padding: 2mm 3mm; }
+  .ficha b { display: block; font-size: 8pt; color: var(--cinza); text-transform: uppercase; letter-spacing: .04em; }
+  .destaque { background: #fff8eb; border: 1px solid #f3d9a8; border-radius: 2mm; padding: 2.5mm 3.5mm; margin: 2mm 0 3mm; }
+  .nivel { font-weight: 600; color: var(--azul); white-space: nowrap; }
+  .min { white-space: nowrap; font-weight: 600; }
+  code { font-family: Consolas, monospace; font-size: 9pt; background: #f1f3f8; padding: 0 1mm; border-radius: 1mm; }
+  .fonte { font-size: 8.6pt; color: var(--cinza); }
+  .quebra { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="capa">
+  <h1>Como Ensinar Inspeção Visual Automática de Qualidade com Edge AI – Francisco</h1>
+  <p class="sub">Plano de Aula · Laboratório presencial · Projeto 2 da Matriz Edge AI / Visão Computacional</p>
+</div>
+
+<div class="ficha">
+  <div><b>Público-alvo</b>Estudantes de nível técnico ou superior com Python básico</div>
+  <div><b>Duração</b>3 horas (180 min) em laboratório</div>
+  <div><b>Formato</b>Duplas, projeto real, laboratório guiado</div>
+  <div><b>Projeto</b>Inspeção de latas em esteira: conforme × não conforme</div>
+  <div><b>Tecnologias</b>YOLO26n · NCNN · FastAPI · Docker (amd64/arm64)</div>
+  <div><b>Hardware alvo</b>Raspberry Pi 5 (demonstração opcional)</div>
+</div>
+
+<p><b>Problema que guia a aula:</b> numa linha de envase, latas amassadas, sem rótulo ou sem cor passam a 2 latas por segundo e chegam ao cliente. Inspeção humana cansa e falha. <b>Como um computador do tamanho de um cartão de crédito, sem internet e sem placa de vídeo, pode decidir em tempo real quais latas tirar da linha?</b></p>
+
+<h2>1. Objetivos de aprendizagem (Taxonomia de Bloom revisada)</h2>
+<p>Ao final da aula, cada estudante será capaz de:</p>
+<table>
+  <tr><th style="width:17%">Nível</th><th>Objetivo (verbo observável)</th><th style="width:30%">Evidência na aula</th></tr>
+  <tr><td class="nivel">Lembrar</td><td><b>Identificar</b> os elementos de uma detecção: caixa, classe e confiança.</td><td>Quiz relâmpago 1</td></tr>
+  <tr><td class="nivel">Entender</td><td><b>Explicar</b> por que processar na borda (Edge AI) em vez de enviar imagens para a nuvem nesse cenário.</td><td>Explicação da dupla ao professor</td></tr>
+  <tr><td class="nivel">Aplicar</td><td><b>Executar</b> o sistema em um container Docker e <b>usar</b> os endpoints HTTP de detecção (JSON e imagem anotada).</td><td>Respostas da API salvas pela dupla</td></tr>
+  <tr><td class="nivel">Analisar</td><td><b>Comparar</b> a latência do mesmo modelo em PyTorch e em NCNN na CPU e <b>relacionar</b> com a velocidade da esteira.</td><td>Tabela de benchmark da dupla</td></tr>
+  <tr><td class="nivel">Avaliar</td><td><b>Decidir</b> o limiar de confiança e <b>justificar</b> se o sistema atende a linha em tempo real na Raspberry Pi 5.</td><td>Ficha de decisão técnica</td></tr>
+  <tr><td class="nivel">Criar</td><td><b>Propor</b> uma melhoria (nova classe, alerta MQTT, quantização) para a próxima versão do sistema.</td><td>Desafio extra / próximos passos</td></tr>
+</table>
+
+<h2>2. Metodologia ativa e justificativa</h2>
+<h3>Estratégias combinadas</h3>
+<ul>
+  <li><b>Aprendizagem Baseada em Projetos (PBL):</b> a aula inteira gira em torno de um problema industrial real com entregável concreto: uma decisão técnica sobre colocar ou não o sistema na linha.</li>
+  <li><b>Programação em pares (piloto e navegador):</b> o piloto digita e o navegador lê a instrução e confere o resultado. Os papéis trocam a cada bloco de 20–25 min.</li>
+  <li><b>Laboratório guiado em degraus:</b> cada degrau tem um "checkpoint" visível (container no ar, primeira resposta JSON, primeira imagem anotada, tabela de latência). Ninguém avança no escuro.</li>
+  <li><b>Instrução por pares (Peer Instruction):</b> nos quizzes, cada estudante vota sozinho, discute com a dupla e vota de novo antes da explicação.</li>
+</ul>
+<h3>Por que não uma aula só expositiva</h3>
+<ul>
+  <li>Uma meta-análise de 225 estudos em ciências e engenharia (Freeman et al., 2014) mostrou que estudantes em aulas expositivas tradicionais tiveram <b>1,5 vez mais chance de reprovação</b> do que em aulas com aprendizagem ativa.</li>
+  <li>O público tem só Python básico. Fórmulas de redes neurais não o ajudariam, mas ver uma lata amassada ser marcada em vermelho cria o significado que sustenta os conceitos.</li>
+  <li>Turmas heterogêneas: em duplas, quem tem mais prática em terminal apoia quem tem menos. O desafio extra ocupa quem termina antes, sem atrasar o grupo.</li>
+  <li>Os erros reais do laboratório (build lento, modelo não carrega, latência alta) viram conteúdo da aula, não interrupção.</li>
+</ul>
+
+<h2>3. Requisitos técnicos e pedagógicos</h2>
+<h3>Infraestrutura (por dupla)</h3>
+<table>
+  <tr><th style="width:28%">Item</th><th>Especificação</th></tr>
+  <tr><td>Computador do laboratório</td><td>Linux ou Windows com Docker (Desktop ou Engine), 8 GB de RAM, 15 GB livres, navegador e terminal</td></tr>
+  <tr><td>Imagem Docker</td><td><code>inspecao-latas</code> já montada em cada máquina antes da aula (a montagem leva vários minutos e baixa cerca de 1 GB)</td></tr>
+  <tr><td>Repositório do projeto</td><td>Clonado na máquina: código, modelo NCNN, vídeo da esteira e pasta de imagens de teste</td></tr>
+  <tr><td>Imagens de teste</td><td>20 quadros da esteira com latas boas e com defeito (pasta <code>dataset/imagens</code>)</td></tr>
+  <tr><td>Rede</td><td>Rede local; internet não é necessária durante a aula (o sistema roda offline)</td></tr>
+</table>
+<h3>Infraestrutura (sala)</h3>
+<ul>
+  <li>Projetor e computador do professor com a mesma imagem e o vídeo da esteira.</li>
+  <li><b>Opcional:</b> 1 kit Raspberry Pi 5 (fonte, SSD 32 GB, câmera USB, módulo relé + LED simulando o soprador) para demonstração ao vivo. A aula funciona sem ele.</li>
+</ul>
+<h3>Conhecimento prévio necessário</h3>
+<table>
+  <tr><th style="width:28%">Precisa saber</th><th>Não precisa saber</th></tr>
+  <tr><td>Python básico: variáveis, listas, dicionários, funções; abrir um terminal e rodar um comando</td><td>Matemática de redes neurais, treino de modelos, Docker avançado, programação embarcada</td></tr>
+</table>
+<p class="destaque"><b>Nivelamento:</b> uma folha de comandos (Docker, curl, navegador) é entregue impressa. Para quem nunca usou terminal, o Swagger (<code>/docs</code>) permite fazer tudo pelo navegador.</p>
+
+<h2 class="quebra">4. Sequência didática (cronograma)</h2>
+<table>
+  <tr><th style="width:11%">Tempo</th><th style="width:21%">Etapa</th><th>O que acontece</th><th style="width:20%">Metodologia / checkpoint</th></tr>
+  <tr><td class="min">0–10 min</td><td>Gancho</td><td>Vídeo da esteira com latas defeituosas passando. Pergunta: "quantas latas ruins vocês viram?" Revelação do número real. Por que um inspetor humano falha.</td><td>Problema real (PBL)</td></tr>
+  <tr><td class="min">10–15</td><td>Objetivos</td><td>"Ao final da aula, vocês vão colocar um detector de defeitos para rodar e decidir se ele aguenta a linha." Formação das duplas e dos papéis.</td><td>Contrato da aula</td></tr>
+  <tr><td class="min">15–35</td><td>Conceitos essenciais</td><td>Classificar × detectar × segmentar · caixa, classe e confiança · modelo pré-treinado e ajuste fino · Edge AI: por que não a nuvem (latência, rede, privacidade, custo).</td><td>Expositiva curta + <b>Quiz relâmpago 1</b> (Peer Instruction)</td></tr>
+  <tr><td class="min">35–55</td><td>Degrau 1: subir o sistema</td><td><code>docker compose up -d</code>, conferir <code>/saude</code>, abrir o Swagger. Professor mostra o Dockerfile: o que é imagem, container, porta, <code>restart: always</code>.</td><td>Checkpoint: API no ar</td></tr>
+  <tr><td class="min">55–80</td><td>Degrau 2: detectar</td><td>Enviar uma imagem ao <code>/detectar</code> (JSON) e ao <code>/detectar/imagem</code> (PNG). Ler o JSON: classe, confiança, caixa, conformes × não conformes, tempo em ms.</td><td>Checkpoint: 1ª imagem anotada · troca de papéis</td></tr>
+  <tr><td class="min">80–90</td><td>Intervalo</td><td>—</td><td>—</td></tr>
+  <tr><td class="min">90–115</td><td>Degrau 3: desempenho</td><td>Rodar o benchmark PyTorch × NCNN na CPU. Comparar com a referência oficial da Raspberry Pi 5 (NCNN ≈ 67 ms por imagem). Conta da dupla: a esteira passa 2 latas/s; o sistema dá conta?</td><td>Checkpoint: tabela de latência · <b>Quiz relâmpago 2</b></td></tr>
+  <tr><td class="min">115–145</td><td>Desafio da dupla</td><td>Com 20 imagens de teste: (1) testar limiares de confiança 0,25 / 0,5 / 0,8; (2) contar quantos defeitos passaram e quantas latas boas foram descartadas; (3) preencher a ficha de decisão: limiar escolhido + "aprovo ou não para a linha" com justificativa.</td><td>PBL + pares · professor circula</td></tr>
+  <tr><td class="min">145–160</td><td>Dúvidas e erros comuns</td><td>Cada dupla traz o erro que encontrou. O professor resolve no projetor 2–3 casos (tabela da seção 6) mostrando como diagnosticar.</td><td>Erro como conteúdo</td></tr>
+  <tr><td class="min">160–175</td><td>Síntese</td><td>Retomar os 6 objetivos e marcar juntos quais foram atingidos. 3 duplas apresentam sua decisão em 1 minuto cada. Fechamento em uma frase: "Edge AI é levar o modelo até a máquina, do tamanho que a máquina aguenta."</td><td>Verificação coletiva</td></tr>
+  <tr><td class="min">175–180</td><td>Próximos passos</td><td>Ticket de saída (2 perguntas) e apresentação da próxima aula.</td><td>Avaliação formativa</td></tr>
+</table>
+
+<h2>5. Instrumentos de avaliação</h2>
+<h3>Avaliação formativa (durante a aula)</h3>
+<ul>
+  <li><b>Quiz relâmpago 1 e 2</b> (3 questões cada, votação com cartões ou formulário): mostram ao professor se pode avançar ou se precisa reexplicar.</li>
+  <li><b>Checkpoints dos degraus:</b> a dupla mostra a tela; o professor registra quem precisou de ajuda e em qual etapa.</li>
+  <li><b>Ticket de saída:</b> "Qual frase define Edge AI?" e "Que número do JSON você olharia primeiro para confiar numa detecção?"</li>
+</ul>
+<h3>Rubrica da entrega da dupla (ficha de decisão + respostas da API)</h3>
+<table>
+  <tr><th style="width:20%">Critério (peso)</th><th>Insuficiente (0)</th><th>Básico (1)</th><th>Proficiente (2)</th><th>Avançado (3)</th></tr>
+  <tr><td><b>Execução</b> (20%)</td><td>Container não subiu</td><td>Subiu com ajuda do professor</td><td>Subiu e respondeu ao <code>/saude</code> sozinha</td><td>Subiu e explicou porta e <code>restart</code></td></tr>
+  <tr><td><b>Uso da API</b> (20%)</td><td>Nenhuma resposta válida</td><td>Só um endpoint</td><td>JSON e PNG obtidos</td><td>Testou também um erro (arquivo inválido)</td></tr>
+  <tr><td><b>Leitura dos resultados</b> (20%)</td><td>Não interpreta o JSON</td><td>Identifica classes</td><td>Relaciona confiança com acerto</td><td>Aponta falsos positivos e negativos</td></tr>
+  <tr><td><b>Análise de desempenho</b> (20%)</td><td>Sem medidas</td><td>Mediu só um formato</td><td>Comparou PyTorch × NCNN</td><td>Relacionou ms com latas/s da esteira</td></tr>
+  <tr><td><b>Decisão técnica</b> (20%)</td><td>Sem decisão</td><td>Decisão sem justificativa</td><td>Limiar justificado com dados</td><td>Considerou o custo de cada tipo de erro</td></tr>
+</table>
+<p class="fonte">Nota final = soma ponderada (0 a 3) convertida para 0–10. A rubrica é entregue no início da aula: os estudantes sabem como serão avaliados.</p>
+
+<h2>6. Gestão de dificuldades (erros previstos)</h2>
+<table>
+  <tr><th style="width:30%">Erro comum</th><th style="width:35%">Causa provável</th><th>Como o professor conduz</th></tr>
+  <tr><td>Build do container demora ou falha</td><td>Rede lenta, falta de espaço, arquitetura errada</td><td>Imagem já montada antes da aula; mostrar <code>docker images</code> e <code>docker buildx</code> como diagnóstico</td></tr>
+  <tr><td>Porta 8000 ocupada</td><td>Outro serviço ou container antigo</td><td>Ensinar <code>docker ps</code> e trocar a porta no compose</td></tr>
+  <tr><td>"Modelo não carrega"</td><td>Pasta do modelo ausente ou caminho errado</td><td>Ler o log com <code>docker compose logs</code>; conferir <code>/saude</code></td></tr>
+  <tr><td>API responde 400</td><td>Arquivo não é imagem ou campo com nome errado</td><td>Ler a mensagem de erro do JSON: erro também é informação</td></tr>
+  <tr><td>Latência alta</td><td>Formato PyTorch na CPU, imagem grande</td><td>Vira o gancho do degrau 3: NCNN e tamanho de entrada</td></tr>
+  <tr><td>Detecção errada</td><td>Classe com poucos exemplos no treino (lata prateada lisa)</td><td>Discutir dados de treino: mais imagens daquele caso</td></tr>
+</table>
+<p><b>Engajamento:</b> placar das duplas por checkpoint no quadro; papel de navegador obrigatório (ninguém fica só olhando); desafio extra para quem termina antes; duplas que terminaram ajudam a dupla vizinha antes de receber o desafio extra.</p>
+
+<h2>7. Recursos e materiais de apoio (checklist antes da aula)</h2>
+<ul>
+  <li>☐ Imagem <code>inspecao-latas</code> montada e testada em todas as máquinas (<code>/saude</code> respondendo)</li>
+  <li>☐ Repositório clonado e pasta com 20 imagens de teste em cada máquina</li>
+  <li>☐ Vídeo da esteira e slides no computador do professor; projetor testado</li>
+  <li>☐ Folha impressa: comandos (Docker, curl), rubrica e ficha de decisão da dupla</li>
+  <li>☐ Quizzes 1 e 2 prontos (cartões A/B/C/D ou formulário online)</li>
+  <li>☐ (Opcional) Kit Raspberry Pi 5 montado com LED no GPIO 17 simulando o soprador</li>
+  <li>☐ Plano B: uma máquina reserva com tudo pronto e a gravação da demonstração</li>
+</ul>
+
+<h2>8. Próximos passos na trilha</h2>
+<ul>
+  <li><b>Próxima aula:</b> criar o próprio dataset (captura de vídeo, anotação e treino do YOLO).</li>
+  <li><b>Desafio opcional:</b> enviar um alerta MQTT a cada lata reprovada; ou exportar o modelo em INT8 e medir o ganho de latência e a perda de precisão.</li>
+  <li><b>Leitura complementar:</b> guia Ultralytics para Raspberry Pi e documentação de exportação de modelos.</li>
+</ul>
+
+<h2>Referências</h2>
+<p class="fonte">
+ANDERSON, L. W.; KRATHWOHL, D. R. (org.). <i>A Taxonomy for Learning, Teaching, and Assessing: A Revision of Bloom's Taxonomy of Educational Objectives</i>. New York: Longman, 2001.<br>
+FREEMAN, S. et al. Active learning increases student performance in science, engineering, and mathematics. <i>PNAS</i>, v. 111, n. 23, p. 8410–8415, 2014.<br>
+MAZUR, E. <i>Peer Instruction: A User's Manual</i>. Upper Saddle River: Prentice Hall, 1997.<br>
+ULTRALYTICS. Quick Start Guide: Raspberry Pi with Ultralytics YOLO. Disponível em: docs.ultralytics.com/guides/raspberry-pi. Acesso em: 4 out. 2026.
+</p>
+
+</body>
+</html>
