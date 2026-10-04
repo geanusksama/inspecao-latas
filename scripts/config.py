@@ -12,7 +12,8 @@ Quem usa o quê:
     5_prerotular.py      MODELO_TREINADO, CONFIANCA, PASTA_IMAGENS, PASTA_ROTULOS
     inspecao.py          CLASSES, CONFIANCA, CORES, PASTA_SAIDA
     6_inspecionar*.py    LINHA_X, MODELO_INSPECAO, VIDEO_PADRAO, CLASSES, CORES
-    8_gerar_raspberry.py MODELO_TREINADO, MODELO_NCNN, PASTA_RASPBERRY, TAMANHO_IMAGEM, VIDEO_PADRAO
+    8_exportar_ncnn.py   MODELO_TREINADO, MODELO_NCNN, TAMANHO_IMAGEM
+    api.py               CLASSES, CONFIANCA, CORES, MODELO_INSPECAO, MODELO_NCNN
     saida_gpio.py        PINO_GPIO, TEMPO_SOPRO
     7_ler_lotes.py       PASTA_SAIDA
     menu.py              PASTA_SAIDA, VIDEO_PADRAO, SEM_TELA
@@ -63,7 +64,7 @@ PASTA_TREINOS = RAIZ / "treinos"  # onde o Ultralytics grava gráficos e pesos d
 # Melhor modelo do treino: é ele que a inspeção usa
 MODELO_TREINADO = PASTA_TREINOS / "latas" / "weights" / "best.pt"
 
-# Mesmo modelo convertido para NCNN (8_gerar_raspberry.py): mais leve e rápido na Raspberry Pi
+# Mesmo modelo convertido para NCNN (8_exportar_ncnn.py): mais leve e rápido na Raspberry Pi
 MODELO_NCNN = PASTA_TREINOS / "latas" / "weights" / "best_ncnn_model"
 # A inspeção usa o NCNN se ele existir; senão, o best.pt
 MODELO_INSPECAO = MODELO_NCNN if MODELO_NCNN.exists() else MODELO_TREINADO
@@ -82,9 +83,6 @@ LINHA_X = 0.3  # posição da linha vertical: 0 = borda esquerda, 0.5 = meio, 1 
 PASTA_SAIDA = RAIZ / "saida"  # CSV, resumo e imagens das latas com defeito
 # True quando não há monitor (Docker na Raspberry): o menu roda só a inspeção sem janela
 SEM_TELA = os.environ.get("SEM_TELA") == "1"
-
-# Pasta com a versão da Raspberry Pi (gerada pelo 8_gerar_raspberry.py; é o repositório Git)
-PASTA_RASPBERRY = RAIZ / "raspberry"
 
 # Saída digital que aciona o sopro da lata reprovada (GPIO da Raspberry Pi ou relé)
 PINO_GPIO = 17      # numeração BCM
