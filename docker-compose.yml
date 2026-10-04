@@ -1,0 +1,14 @@
+# Sobe a API de inspeção no PC, notebook, VM ou nuvem (amd64 ou arm64).
+#   docker compose up -d --build      → API em http://localhost:8000/docs
+# Na Raspberry Pi use raspberry/docker-compose.yml (acesso ao GPIO do soprador).
+
+services:
+  inspecao:
+    build: .
+    image: inspecao-latas
+    ports:
+      - "8000:8000"            # API HTTP
+    restart: always            # volta sozinho após queda ou reinício da máquina
+    volumes:
+      - ./saida:/app/saida     # resultados da inspeção de vídeo ficam fora do container
+      - ./videos:/app/videos   # vídeos extras para inspecionar pelo menu

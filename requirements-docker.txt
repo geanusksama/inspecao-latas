@@ -1,0 +1,15 @@
+# Bibliotecas da imagem Docker (inferência apenas: API + inspeção).
+# O PyTorch só para CPU é instalado antes, à parte, no Dockerfile.
+# Treino e anotação usam o requirements.txt, no PC.
+
+ultralytics==8.4.172       # YOLO26: detecção e rastreio
+opencv-python==5.0.0.93    # decodifica imagens, lê vídeo, desenha as caixas
+ncnn==1.0.20260526         # motor que roda o modelo NCNN na CPU (ARM e x86)
+lap==0.5.13                # usado pelo rastreador (ByteTrack) da inspeção em vídeo
+fastapi==0.142.2           # API HTTP
+uvicorn==0.54.0            # servidor da API
+python-multipart==0.0.32   # recebe o upload de imagens na API
+rapidocr==3.9.2            # OCR que lê o lote (7_ler_lotes.py)
+onnxruntime==1.30.0        # motor que roda os modelos do RapidOCR
+gpiozero                   # pino do soprador (na Raspberry; no PC fica em modo simulado)
+lgpio                      # acesso ao GPIO da Raspberry Pi 5 (usado pelo gpiozero)

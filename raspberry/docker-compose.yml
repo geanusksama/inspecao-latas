@@ -1,0 +1,14 @@
+# Sobe a inspeção na Raspberry Pi 5. Normalmente você usa: sh raspberry/iniciar.sh
+# A imagem é a mesma do PC (Dockerfile na raiz do projeto), montada para arm64.
+
+services:
+  inspecao:
+    build: ..                  # Dockerfile na raiz do projeto
+    image: inspecao-latas
+    ports:
+      - "8000:8000"            # API HTTP: http://IP-da-raspberry:8000/docs
+    restart: always            # sobe sozinho quando a Raspberry liga
+    privileged: true           # acesso ao GPIO (soprador) e à câmera USB
+    volumes:
+      - ../saida:/app/saida    # resultados ficam na Raspberry, fora do container
+      - ../videos:/app/videos  # vídeos extras para inspecionar pelo menu

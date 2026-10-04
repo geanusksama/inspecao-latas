@@ -1,0 +1,2 @@
+# Scripts do Linux precisam de fim de linha LF (senão o "sh" da Raspberry falha)
+*.sh text eol=lf

@@ -1,0 +1,15 @@
+# Fica FORA da imagem: só entra o que a inferência usa (ver COPY no Dockerfile)
+.git
+venv
+curso
+dataset
+vtrieino
+saida
+docs
+raspberry
+**/__pycache__
+yolo26n.pt
+treinos/latas/*.png
+treinos/latas/*.jpg
+treinos/latas/*.csv
+treinos/latas/weights/*.pt
