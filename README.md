@@ -17,7 +17,7 @@ Qualidade em Linha de Produção**.
 | **API** | FastAPI: `/detectar` (JSON) e `/detectar/imagem` (PNG anotado) + Swagger em `/docs` |
 | **Container** | Docker multi-arquitetura `linux/amd64` + `linux/arm64`, `restart: always`, porta 8000 |
 | **Saídas** | GPIO 17 (soprador), CSV por lata, imagens anotadas, leitura do lote por OCR |
-| **Material didático** | [Plano de Aula (PDF)](docs/Como_Ensinar_Inspecao_Visual_Edge_AI_Plano_de_Aula.pdf) |
+| **Material didático** | [Plano de Aula (PDF)](docs/Como_Ensinar_Inspecao_Visual_Edge_AI_Plano_de_Aula.pdf) · [Aula Expositiva (slides, PDF)](docs/Como_Ensinar_Inspecao_Visual_Edge_AI_Aula_Expositiva.pdf) |
 
 ---
 
@@ -258,7 +258,7 @@ inspecao-latas/
 ├── treinos/latas/weights/       best.pt (PyTorch) e best_ncnn_model/ (NCNN)
 ├── dataset/                     60 imagens + 60 rótulos YOLO
 ├── vtrieino/ · esteirafull.mp4  vídeo de treino e vídeo de teste da esteira
-└── docs/                        plano de aula (PDF), benchmark, imagem de exemplo
+└── docs/                        plano de aula e slides (PDF), benchmark, imagem de exemplo
 ```
 
 | Etapa | Script | O que faz |
