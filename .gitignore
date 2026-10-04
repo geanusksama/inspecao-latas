@@ -16,3 +16,6 @@ yolo26n.pt
 # Documentos do processo seletivo: NÃO publicar
 Teste_*.docx
 *.xlsx
+
+# Pasta pessoal de entrega (relatório e PDFs para envio): fica só no PC
+entrega/

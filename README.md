@@ -57,6 +57,8 @@ conformidade e os lotes afetados. Os resultados ficam em `./saida`.
 
 **Na Raspberry Pi 5:** veja o passo a passo em [`raspberry/LEIAME.md`](raspberry/LEIAME.md) (`sh raspberry/iniciar.sh`).
 
+**Guia para quem nunca usou Docker** (testar no PC e na Raspberry, passo a passo): [`COMO_TESTAR.md`](COMO_TESTAR.md).
+
 ---
 
 ## 2. Endpoints HTTP
