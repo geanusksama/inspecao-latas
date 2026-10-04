@@ -12,6 +12,10 @@ opencv-python==5.0.0.93    # vídeo, desenho e janelas (NÃO use opencv-python-h
 lap==0.5.13                # usado pelo rastreador (ByteTrack) para ligar as caixas entre quadros
 rapidocr==3.9.2            # OCR que lê o lote (só o 7_ler_lotes.py usa)
 onnxruntime==1.30.0        # motor que roda os modelos do RapidOCR
+ncnn==1.0.20260526         # roda o modelo NCNN (8_exportar_ncnn.py, 9_benchmark.py)
+fastapi==0.142.2           # API HTTP (api.py)
+uvicorn==0.54.0            # servidor da API
+python-multipart==0.0.32   # upload de imagens na API
 
 # 3) Só na Raspberry Pi (controle do pino do soprador):
 #      pip install gpiozero
