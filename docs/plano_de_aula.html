@@ -4,172 +4,345 @@
 <meta charset="utf-8">
 <title>Como Ensinar Inspeção Visual Automática de Qualidade com Edge AI – Francisco Lima</title>
 <style>
-  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
-  :root { --azul: #1d4ed8; --azul-claro: #e8efff; --cinza: #5b6474; --borda: #d9dee8; --laranja: #b45309; }
+  @page { size: A4; margin: 14mm 13mm 14mm 13mm; }
   * { box-sizing: border-box; }
-  body { font: 10.3pt/1.45 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #1c2230; margin: 0; }
-  h1 { font-size: 20pt; margin: 0 0 2mm; color: #0f1b3d; letter-spacing: -.01em; }
-  h2 { font-size: 13pt; color: var(--azul); margin: 7mm 0 2.5mm; padding-bottom: 1.2mm; border-bottom: 1.5px solid var(--azul-claro); page-break-after: avoid; }
-  h3 { font-size: 10.8pt; margin: 4mm 0 1.5mm; page-break-after: avoid; }
-  p { margin: 0 0 2.2mm; }
-  ul, ol { margin: 0 0 2.5mm; padding-left: 5.5mm; }
-  li { margin-bottom: .8mm; }
-  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.3pt; page-break-inside: auto; }
+  body { font: 10pt/1.35 Arial, Helvetica, sans-serif; color: #000; margin: 0; }
+  .doc-titulo { text-align: center; font-size: 9pt; color: #444; margin-bottom: 2mm; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 4mm; page-break-inside: auto; }
   tr { page-break-inside: avoid; }
-  th { background: var(--azul-claro); color: #0f1b3d; text-align: left; font-weight: 600; }
-  th, td { border: 1px solid var(--borda); padding: 1.6mm 2mm; vertical-align: top; }
-  .capa { border-left: 5px solid var(--azul); padding: 2mm 0 2mm 5mm; margin-bottom: 5mm; }
-  .sub { color: var(--cinza); font-size: 11pt; margin: 0; }
-  .ficha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm; margin: 4mm 0; }
-  .ficha div { background: #f6f8fc; border: 1px solid var(--borda); border-radius: 2mm; padding: 2mm 3mm; }
-  .ficha b { display: block; font-size: 8pt; color: var(--cinza); text-transform: uppercase; letter-spacing: .04em; }
-  .destaque { background: #fff8eb; border: 1px solid #f3d9a8; border-radius: 2mm; padding: 2.5mm 3.5mm; margin: 2mm 0 3mm; }
-  .nivel { font-weight: 600; color: var(--azul); white-space: nowrap; }
-  .min { white-space: nowrap; font-weight: 600; }
-  code { font-family: Consolas, monospace; font-size: 9pt; background: #f1f3f8; padding: 0 1mm; border-radius: 1mm; }
-  .fonte { font-size: 8.6pt; color: var(--cinza); }
+  td, th { border: 1px solid #000; padding: 1.6mm 2mm; vertical-align: top; text-align: left; }
+  .moldura { border: 2px solid #000; }
+  .rotulo { font-weight: bold; text-transform: uppercase; font-size: 9.5pt; }
+  .titulo-geral { text-align: center; font-size: 17pt; font-weight: bold; padding: 3mm; }
+  .secao { font-weight: bold; text-transform: uppercase; font-size: 9.5pt; background: #f2f2f2; }
+  ol { margin: 0; padding-left: 6mm; }
+  ol li { margin: .6mm 0; }
+  .bloom { font-size: 8pt; color: #555; }
+  /* conhecimentos */
+  .conh p { margin: 1mm 0; }
+  .n1 { font-weight: bold; margin-top: 2.5mm !important; }
+  .n1 span, .n2 span, .n3 span { display: inline-block; width: 10mm; }
+  .n2 { padding-left: 2mm; }
+  .n3 { padding-left: 8mm; }
+  /* instrumento de avaliação */
+  .aval td, .aval th { padding: 1.1mm 1.4mm; font-size: 8.4pt; }
+  .natureza { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-weight: bold; width: 7mm; }
+  .critico { color: #c00000; }
+  .desejavel { color: #2f5597; }
+  .fs { width: 5mm; text-align: center; font-weight: bold; }
+  .aluno { width: 5mm; }
+  .legenda td { border: 1px solid #000; padding: .6mm 1.5mm; font-size: 8pt; text-align: center; }
   .quebra { page-break-before: always; }
+  .pequeno { font-size: 8.6pt; }
+  .centro { text-align: center; }
 </style>
 </head>
 <body>
 
-<div class="capa">
-  <h1>Como Ensinar Inspeção Visual Automática de Qualidade com Edge AI – Francisco Lima</h1>
-  <p class="sub">Plano de Aula · Laboratório presencial · Projeto 2 da Matriz Edge AI / Visão Computacional</p>
-</div>
+<div class="doc-titulo">Como Ensinar Inspeção Visual Automática de Qualidade com Edge AI – Francisco Lima</div>
 
-<div class="ficha">
-  <div><b>Público-alvo</b>Estudantes de nível técnico ou superior com Python básico</div>
-  <div><b>Duração</b>3 horas (180 min) em laboratório</div>
-  <div><b>Formato</b>Duplas, projeto real, laboratório guiado</div>
-  <div><b>Projeto</b>Inspeção de latas em esteira: conforme × não conforme</div>
-  <div><b>Tecnologias</b>YOLO26n · NCNN · FastAPI · Docker (amd64/arm64)</div>
-  <div><b>Hardware alvo</b>Raspberry Pi 5 (demonstração opcional)</div>
-</div>
-
-<p><b>Problema que guia a aula:</b> numa linha de envase, latas amassadas, sem rótulo ou sem cor passam a 2 latas por segundo e chegam ao cliente. Inspeção humana cansa e falha. <b>Como um computador do tamanho de um cartão de crédito, sem internet e sem placa de vídeo, pode decidir em tempo real quais latas tirar da linha?</b></p>
-
-<h2>1. Objetivos de aprendizagem (Taxonomia de Bloom revisada)</h2>
-<p>Ao final da aula, cada estudante será capaz de:</p>
-<table>
-  <tr><th style="width:17%">Nível</th><th>Objetivo (verbo observável)</th><th style="width:30%">Evidência na aula</th></tr>
-  <tr><td class="nivel">Lembrar</td><td><b>Identificar</b> os elementos de uma detecção: caixa, classe e confiança.</td><td>Quiz relâmpago 1</td></tr>
-  <tr><td class="nivel">Entender</td><td><b>Explicar</b> por que processar na borda (Edge AI) em vez de enviar imagens para a nuvem nesse cenário.</td><td>Explicação da dupla ao professor</td></tr>
-  <tr><td class="nivel">Aplicar</td><td><b>Executar</b> o sistema em um container Docker e <b>usar</b> os endpoints HTTP de detecção (JSON e imagem anotada).</td><td>Respostas da API salvas pela dupla</td></tr>
-  <tr><td class="nivel">Analisar</td><td><b>Comparar</b> a latência do mesmo modelo em PyTorch e em NCNN na CPU e <b>relacionar</b> com a velocidade da esteira.</td><td>Tabela de benchmark da dupla</td></tr>
-  <tr><td class="nivel">Avaliar</td><td><b>Decidir</b> o limiar de confiança e <b>justificar</b> se o sistema atende a linha em tempo real na Raspberry Pi 5.</td><td>Ficha de decisão técnica</td></tr>
-  <tr><td class="nivel">Criar</td><td><b>Propor</b> uma melhoria (nova classe, alerta MQTT, quantização) para a próxima versão do sistema.</td><td>Desafio extra / próximos passos</td></tr>
+<!-- CABEÇALHO -->
+<table class="moldura">
+  <tr><td colspan="4" class="titulo-geral">PLANO DE AULA</td></tr>
+  <tr><td colspan="2" class="rotulo">Curso</td><td class="rotulo">Módulo</td><td class="rotulo">Código</td></tr>
+  <tr><td colspan="2">Inteligência Artificial Aplicada (presencial)</td><td>Específico</td><td>IAE-VCE</td></tr>
+  <tr><td class="rotulo" style="width:34%">Unidade curricular</td><td class="rotulo">Carga horária prevista</td><td class="rotulo">Docente</td><td class="rotulo">Turma</td></tr>
+  <tr><td>Visão Computacional Embarcada (Edge AI)</td><td>3 h (180 min) – laboratório</td><td>Francisco Lima</td><td>A definir</td></tr>
+  <tr><td colspan="4" class="rotulo">Objetivo da unidade curricular</td></tr>
+  <tr><td colspan="4"><b>Objetivo:</b> Proporcionar a aquisição de capacidades técnicas relativas à implantação de sistemas de visão computacional embarcados, promovendo a inspeção automática de produtos em linha de produção por meio de modelos de detecção de objetos executados na borda (Edge AI), em container e com integração via API, bem como o desenvolvimento de capacidades sociais, organizativas e metodológicas adequadas a diferentes situações profissionais.</td></tr>
+  <tr><td colspan="4"><b>Público-alvo:</b> estudantes de nível técnico ou superior com conhecimentos básicos em Python.</td></tr>
 </table>
 
-<h2>2. Metodologia ativa e justificativa</h2>
-<h3>Estratégias combinadas</h3>
-<ul>
-  <li><b>Aprendizagem Baseada em Projetos (PBL):</b> a aula inteira gira em torno de um problema industrial real com entregável concreto: uma decisão técnica sobre colocar ou não o sistema na linha.</li>
-  <li><b>Programação em pares (piloto e navegador):</b> o piloto digita e o navegador lê a instrução e confere o resultado. Os papéis trocam a cada bloco de 20–25 min.</li>
-  <li><b>Laboratório guiado em degraus:</b> cada degrau tem um "checkpoint" visível (container no ar, primeira resposta JSON, primeira imagem anotada, tabela de latência). Ninguém avança no escuro.</li>
-  <li><b>Instrução por pares (Peer Instruction):</b> nos quizzes, cada estudante vota sozinho, discute com a dupla e vota de novo antes da explicação.</li>
-</ul>
-<h3>Por que não uma aula só expositiva</h3>
-<ul>
-  <li>Uma meta-análise de 225 estudos em ciências e engenharia (Freeman et al., 2014) mostrou que estudantes em aulas expositivas tradicionais tiveram <b>1,5 vez mais chance de reprovação</b> do que em aulas com aprendizagem ativa.</li>
-  <li>O público tem só Python básico. Fórmulas de redes neurais não o ajudariam, mas ver uma lata amassada ser marcada em vermelho cria o significado que sustenta os conceitos.</li>
-  <li>Turmas heterogêneas: em duplas, quem tem mais prática em terminal apoia quem tem menos. O desafio extra ocupa quem termina antes, sem atrasar o grupo.</li>
-  <li>Os erros reais do laboratório (build lento, modelo não carrega, latência alta) viram conteúdo da aula, não interrupção.</li>
-</ul>
-
-<h2>3. Requisitos técnicos e pedagógicos</h2>
-<h3>Infraestrutura (por dupla)</h3>
-<table>
-  <tr><th style="width:28%">Item</th><th>Especificação</th></tr>
-  <tr><td>Computador do laboratório</td><td>Linux ou Windows com Docker (Desktop ou Engine), 8 GB de RAM, 15 GB livres, navegador e terminal</td></tr>
-  <tr><td>Imagem Docker</td><td><code>inspecao-latas</code> já montada em cada máquina antes da aula (a montagem leva vários minutos e baixa cerca de 1 GB)</td></tr>
-  <tr><td>Repositório do projeto</td><td>Clonado na máquina: código, modelo NCNN, vídeo da esteira e pasta de imagens de teste</td></tr>
-  <tr><td>Imagens de teste</td><td>20 quadros da esteira com latas boas e com defeito (pasta <code>dataset/imagens</code>)</td></tr>
-  <tr><td>Rede</td><td>Rede local; internet não é necessária durante a aula (o sistema roda offline)</td></tr>
-</table>
-<h3>Infraestrutura (sala)</h3>
-<ul>
-  <li>Projetor e computador do professor com a mesma imagem e o vídeo da esteira.</li>
-  <li><b>Opcional:</b> 1 kit Raspberry Pi 5 (fonte, SSD 32 GB, câmera USB, módulo relé + LED simulando o soprador) para demonstração ao vivo. A aula funciona sem ele.</li>
-</ul>
-<h3>Conhecimento prévio necessário</h3>
-<table>
-  <tr><th style="width:28%">Precisa saber</th><th>Não precisa saber</th></tr>
-  <tr><td>Python básico: variáveis, listas, dicionários, funções; abrir um terminal e rodar um comando</td><td>Matemática de redes neurais, treino de modelos, Docker avançado, programação embarcada</td></tr>
-</table>
-<p class="destaque"><b>Nivelamento:</b> uma folha de comandos (Docker, curl, navegador) é entregue impressa. Para quem nunca usou terminal, o Swagger (<code>/docs</code>) permite fazer tudo pelo navegador.</p>
-
-<h2 class="quebra">4. Sequência didática (cronograma)</h2>
-<table>
-  <tr><th style="width:11%">Tempo</th><th style="width:21%">Etapa</th><th>O que acontece</th><th style="width:20%">Metodologia / checkpoint</th></tr>
-  <tr><td class="min">0–10 min</td><td>Gancho</td><td>Vídeo da esteira com latas defeituosas passando. Pergunta: "quantas latas ruins vocês viram?" Revelação do número real. Por que um inspetor humano falha.</td><td>Problema real (PBL)</td></tr>
-  <tr><td class="min">10–15</td><td>Objetivos</td><td>"Ao final da aula, vocês vão colocar um detector de defeitos para rodar e decidir se ele aguenta a linha." Formação das duplas e dos papéis.</td><td>Contrato da aula</td></tr>
-  <tr><td class="min">15–35</td><td>Conceitos essenciais</td><td>Classificar × detectar × segmentar · caixa, classe e confiança · modelo pré-treinado e ajuste fino · Edge AI: por que não a nuvem (latência, rede, privacidade, custo).</td><td>Expositiva curta + <b>Quiz relâmpago 1</b> (Peer Instruction)</td></tr>
-  <tr><td class="min">35–55</td><td>Degrau 1: subir o sistema</td><td><code>docker compose up -d</code>, conferir <code>/saude</code>, abrir o Swagger. Professor mostra o Dockerfile: o que é imagem, container, porta, <code>restart: always</code>.</td><td>Checkpoint: API no ar</td></tr>
-  <tr><td class="min">55–80</td><td>Degrau 2: detectar</td><td>Enviar uma imagem ao <code>/detectar</code> (JSON) e ao <code>/detectar/imagem</code> (PNG). Ler o JSON: classe, confiança, caixa, conformes × não conformes, tempo em ms.</td><td>Checkpoint: 1ª imagem anotada · troca de papéis</td></tr>
-  <tr><td class="min">80–90</td><td>Intervalo</td><td>—</td><td>—</td></tr>
-  <tr><td class="min">90–115</td><td>Degrau 3: desempenho</td><td>Rodar o benchmark PyTorch × NCNN na CPU. Comparar com a referência oficial da Raspberry Pi 5 (NCNN ≈ 67 ms por imagem). Conta da dupla: a esteira passa 2 latas/s; o sistema dá conta?</td><td>Checkpoint: tabela de latência · <b>Quiz relâmpago 2</b></td></tr>
-  <tr><td class="min">115–145</td><td>Desafio da dupla</td><td>Com 20 imagens de teste: (1) testar limiares de confiança 0,25 / 0,5 / 0,8; (2) contar quantos defeitos passaram e quantas latas boas foram descartadas; (3) preencher a ficha de decisão: limiar escolhido + "aprovo ou não para a linha" com justificativa.</td><td>PBL + pares · professor circula</td></tr>
-  <tr><td class="min">145–160</td><td>Dúvidas e erros comuns</td><td>Cada dupla traz o erro que encontrou. O professor resolve no projetor 2–3 casos (tabela da seção 6) mostrando como diagnosticar.</td><td>Erro como conteúdo</td></tr>
-  <tr><td class="min">160–175</td><td>Síntese</td><td>Retomar os 6 objetivos e marcar juntos quais foram atingidos. 3 duplas apresentam sua decisão em 1 minuto cada. Fechamento em uma frase: "Edge AI é levar o modelo até a máquina, do tamanho que a máquina aguenta."</td><td>Verificação coletiva</td></tr>
-  <tr><td class="min">175–180</td><td>Próximos passos</td><td>Ticket de saída (2 perguntas) e apresentação da próxima aula.</td><td>Avaliação formativa</td></tr>
+<!-- CAPACIDADES TÉCNICAS -->
+<table class="moldura">
+  <tr><td class="rotulo">Fundamentos técnicos e científicos ou capacidades técnicas</td></tr>
+  <tr><td>
+    <ol>
+      <li>Identificar os elementos de uma detecção de objetos: caixa delimitadora, classe e confiança <span class="bloom">(Lembrar)</span></li>
+      <li>Descrever as etapas de criação e operação de um sistema de inspeção: dados, anotação, treino, exportação e linha de produção <span class="bloom">(Entender)</span></li>
+      <li>Explicar as vantagens do processamento na borda (Edge AI) em relação à nuvem <span class="bloom">(Entender)</span></li>
+      <li>Preparar o ambiente de execução da aplicação de inferência em container Docker <span class="bloom">(Aplicar)</span></li>
+      <li>Utilizar API HTTP de inferência com retorno em JSON e em imagem anotada <span class="bloom">(Aplicar)</span></li>
+      <li>Interpretar os resultados da inferência para classificar peças como conformes ou não conformes <span class="bloom">(Analisar)</span></li>
+      <li>Comparar o desempenho do modelo em diferentes formatos de inferência <span class="bloom">(Analisar)</span></li>
+      <li>Avaliar a viabilidade de operação em tempo real no hardware embarcado <span class="bloom">(Avaliar)</span></li>
+      <li>Propor melhorias para a solução embarcada <span class="bloom">(Criar)</span></li>
+    </ol>
+    <p class="pequeno" style="margin:2mm 0 0">Entre parênteses: nível da Taxonomia de Bloom revisada (Anderson; Krathwohl, 2001).</p>
+  </td></tr>
 </table>
 
-<h2>5. Instrumentos de avaliação</h2>
-<h3>Avaliação formativa (durante a aula)</h3>
-<ul>
-  <li><b>Quiz relâmpago 1 e 2</b> (3 questões cada, votação com cartões ou formulário): mostram ao professor se pode avançar ou se precisa reexplicar.</li>
-  <li><b>Checkpoints dos degraus:</b> a dupla mostra a tela; o professor registra quem precisou de ajuda e em qual etapa.</li>
-  <li><b>Ticket de saída:</b> "Qual frase define Edge AI?" e "Que número do JSON você olharia primeiro para confiar numa detecção?"</li>
-</ul>
-<h3>Rubrica da entrega da dupla (ficha de decisão + respostas da API)</h3>
-<table>
-  <tr><th style="width:20%">Critério (peso)</th><th>Insuficiente (0)</th><th>Básico (1)</th><th>Proficiente (2)</th><th>Avançado (3)</th></tr>
-  <tr><td><b>Execução</b> (20%)</td><td>Container não subiu</td><td>Subiu com ajuda do professor</td><td>Subiu e respondeu ao <code>/saude</code> sozinha</td><td>Subiu e explicou porta e <code>restart</code></td></tr>
-  <tr><td><b>Uso da API</b> (20%)</td><td>Nenhuma resposta válida</td><td>Só um endpoint</td><td>JSON e PNG obtidos</td><td>Testou também um erro (arquivo inválido)</td></tr>
-  <tr><td><b>Leitura dos resultados</b> (20%)</td><td>Não interpreta o JSON</td><td>Identifica classes</td><td>Relaciona confiança com acerto</td><td>Aponta falsos positivos e negativos</td></tr>
-  <tr><td><b>Análise de desempenho</b> (20%)</td><td>Sem medidas</td><td>Mediu só um formato</td><td>Comparou PyTorch × NCNN</td><td>Relacionou ms com latas/s da esteira</td></tr>
-  <tr><td><b>Decisão técnica</b> (20%)</td><td>Sem decisão</td><td>Decisão sem justificativa</td><td>Limiar justificado com dados</td><td>Considerou o custo de cada tipo de erro</td></tr>
+<!-- CAPACIDADES SOCIAIS -->
+<table class="moldura">
+  <tr><td class="rotulo">Capacidades sociais, organizativas e metodológicas</td></tr>
+  <tr><td>
+    <ol>
+      <li>Demonstrar atenção a detalhes</li>
+      <li>Demonstrar capacidade de comunicação com profissionais de diferentes áreas e especialidades</li>
+      <li>Demonstrar capacidade de organização</li>
+      <li>Demonstrar raciocínio lógico na organização das informações</li>
+      <li>Demonstrar visão sistêmica</li>
+      <li>Seguir método de trabalho</li>
+      <li>Trabalhar em equipe</li>
+    </ol>
+  </td></tr>
 </table>
-<p class="fonte">Nota final = soma ponderada (0 a 3) convertida para 0–10. A rubrica é entregue no início da aula: os estudantes sabem como serão avaliados.</p>
 
-<h2>6. Gestão de dificuldades (erros previstos)</h2>
-<table>
-  <tr><th style="width:30%">Erro comum</th><th style="width:35%">Causa provável</th><th>Como o professor conduz</th></tr>
-  <tr><td>Build do container demora ou falha</td><td>Rede lenta, falta de espaço, arquitetura errada</td><td>Imagem já montada antes da aula; mostrar <code>docker images</code> e <code>docker buildx</code> como diagnóstico</td></tr>
-  <tr><td>Porta 8000 ocupada</td><td>Outro serviço ou container antigo</td><td>Ensinar <code>docker ps</code> e trocar a porta no compose</td></tr>
-  <tr><td>"Modelo não carrega"</td><td>Pasta do modelo ausente ou caminho errado</td><td>Ler o log com <code>docker compose logs</code>; conferir <code>/saude</code></td></tr>
-  <tr><td>API responde 400</td><td>Arquivo não é imagem ou campo com nome errado</td><td>Ler a mensagem de erro do JSON: erro também é informação</td></tr>
-  <tr><td>Latência alta</td><td>Formato PyTorch na CPU, imagem grande</td><td>Vira o gancho do degrau 3: NCNN e tamanho de entrada</td></tr>
-  <tr><td>Detecção errada</td><td>Classe com poucos exemplos no treino (lata prateada lisa)</td><td>Discutir dados de treino: mais imagens daquele caso</td></tr>
+<!-- CONHECIMENTOS -->
+<table class="moldura">
+  <tr><td class="rotulo">Conhecimentos</td></tr>
+  <tr><td class="conh">
+    <p class="n1"><span>1&nbsp;&nbsp;</span>Visão computacional</p>
+    <p class="n2"><span>1.1&nbsp;&nbsp;</span>Definição e aplicações na indústria</p>
+    <p class="n2"><span>1.2&nbsp;&nbsp;</span>Classificação, detecção e segmentação</p>
+    <p class="n2"><span>1.3&nbsp;&nbsp;</span>Elementos da detecção: caixa delimitadora, classe e confiança</p>
+    <p class="n2"><span>1.4&nbsp;&nbsp;</span>Modelos pré-treinados (família YOLO) e ajuste fino</p>
+    <p class="n1"><span>2&nbsp;&nbsp;</span>Ciclo de criação do modelo (visão geral)</p>
+    <p class="n2"><span>2.1&nbsp;&nbsp;</span>Captura de imagens a partir de vídeo</p>
+    <p class="n2"><span>2.2&nbsp;&nbsp;</span>Anotação no formato YOLO</p>
+    <p class="n2"><span>2.3&nbsp;&nbsp;</span>Separação em treino e validação</p>
+    <p class="n2"><span>2.4&nbsp;&nbsp;</span>Treino e métricas: precisão, recall e mAP (noções)</p>
+    <p class="n2"><span>2.5&nbsp;&nbsp;</span>Exportação para formato embarcado (NCNN)</p>
+    <p class="n1"><span>3&nbsp;&nbsp;</span>Inteligência Artificial na borda (Edge AI)</p>
+    <p class="n2"><span>3.1&nbsp;&nbsp;</span>Definição</p>
+    <p class="n2"><span>3.2&nbsp;&nbsp;</span>Borda × nuvem: latência, conectividade, privacidade e custo</p>
+    <p class="n2"><span>3.3&nbsp;&nbsp;</span>Raspberry Pi 5: arquitetura ARM64 e inferência em CPU, sem GPU dedicada</p>
+    <p class="n2"><span>3.4&nbsp;&nbsp;</span>Formatos otimizados e quantização FP16/INT8 (noções)</p>
+    <p class="n1"><span>4&nbsp;&nbsp;</span>Inspeção na linha de produção</p>
+    <p class="n2"><span>4.1&nbsp;&nbsp;</span>Rastreio de objetos entre quadros</p>
+    <p class="n2"><span>4.2&nbsp;&nbsp;</span>Linha virtual de decisão e voto da maioria</p>
+    <p class="n2"><span>4.3&nbsp;&nbsp;</span>Saída digital (GPIO) para o soprador</p>
+    <p class="n2"><span>4.4&nbsp;&nbsp;</span>Registro de não conformidades: CSV e imagens anotadas</p>
+    <p class="n2"><span>4.5&nbsp;&nbsp;</span>Leitura do lote por OCR (noções)</p>
+    <p class="n1"><span>5&nbsp;&nbsp;</span>Containerização</p>
+    <p class="n2"><span>5.1&nbsp;&nbsp;</span>Imagem e container</p>
+    <p class="n2"><span>5.2&nbsp;&nbsp;</span>Dockerfile e docker-compose: porta, volumes e reinício automático</p>
+    <p class="n2"><span>5.3&nbsp;&nbsp;</span>Build multi-arquitetura (amd64 e arm64)</p>
+    <p class="n1"><span>6&nbsp;&nbsp;</span>Inferência por API HTTP</p>
+    <p class="n2"><span>6.1&nbsp;&nbsp;</span>Pipeline: pré-processamento, inferência e pós-processamento</p>
+    <p class="n2"><span>6.2&nbsp;&nbsp;</span>Endpoint com resposta em JSON</p>
+    <p class="n2"><span>6.3&nbsp;&nbsp;</span>Endpoint com imagem anotada (PNG)</p>
+    <p class="n2"><span>6.4&nbsp;&nbsp;</span>Códigos de status e tratamento de erros</p>
+    <p class="n1"><span>7&nbsp;&nbsp;</span>Desempenho e tomada de decisão</p>
+    <p class="n2"><span>7.1&nbsp;&nbsp;</span>Latência: mediana, percentil 95 e quadros por segundo</p>
+    <p class="n2"><span>7.2&nbsp;&nbsp;</span>Benchmark no hardware alvo</p>
+    <p class="n2"><span>7.3&nbsp;&nbsp;</span>Falso positivo × falso negativo e o custo de cada erro</p>
+  </td></tr>
 </table>
-<p><b>Engajamento:</b> placar das duplas por checkpoint no quadro; papel de navegador obrigatório (ninguém fica só olhando); desafio extra para quem termina antes; duplas que terminaram ajudam a dupla vizinha antes de receber o desafio extra.</p>
 
-<h2>7. Recursos e materiais de apoio (checklist antes da aula)</h2>
-<ul>
-  <li>☐ Imagem <code>inspecao-latas</code> montada e testada em todas as máquinas (<code>/saude</code> respondendo)</li>
-  <li>☐ Repositório clonado e pasta com 20 imagens de teste em cada máquina</li>
-  <li>☐ Vídeo da esteira e slides no computador do professor; projetor testado</li>
-  <li>☐ Folha impressa: comandos (Docker, curl), rubrica e ficha de decisão da dupla</li>
-  <li>☐ Quizzes 1 e 2 prontos (cartões A/B/C/D ou formulário online)</li>
-  <li>☐ (Opcional) Kit Raspberry Pi 5 montado com LED no GPIO 17 simulando o soprador</li>
-  <li>☐ Plano B: uma máquina reserva com tudo pronto e a gravação da demonstração</li>
-</ul>
+<!-- ATIVIDADE: SITUAÇÃO DE APRENDIZAGEM (modelo SENAI; cenário da Matriz de Projetos, projeto nº 2) -->
+<table class="moldura">
+  <tr><td colspan="2" class="titulo-geral" style="font-size:13pt">ATIVIDADE</td></tr>
+  <tr><td colspan="2" class="rotulo centro">Situação de aprendizagem: Inspeção Visual Automática de Qualidade em Linha de Produção</td></tr>
+  <tr><td colspan="2" class="secao">Contexto</td></tr>
+  <tr><td colspan="2">
+    <p style="margin:0 0 2mm">Você integra a equipe de engenharia da <b>Refri Vale</b> (empresa fictícia), uma envasadora de refrigerantes em lata. Na última auditoria, o cliente devolveu lotes inteiros porque latas amassadas, sem rótulo e sem pintura chegaram ao mercado. Hoje a inspeção é feita a olho nu por um operador ao lado da esteira, que passa quase 2 latas por segundo, durante todo o turno.</p>
+    <p style="margin:0 0 2mm">A diretoria quer inspecionar <b>100% das latas</b>, sem parar a linha e sem depender de internet ou de servidores externos. A proposta é instalar, ao lado da esteira, uma <b>Raspberry Pi 5</b> com câmera, executando um modelo de visão computacional que decida em tempo real se cada lata é conforme ou não conforme, acione o soprador que retira a lata reprovada e registre a imagem de cada defeito para rastreabilidade.</p>
+    <p style="margin:0">Um primeiro protótipo já está pronto e empacotado em container. Antes de aprovar a instalação, a fábrica precisa da sua avaliação técnica: <b>o sistema funciona, aguenta a velocidade da linha e com qual configuração deve ser colocado em operação?</b> Você vai trabalhar em dupla, como numa equipe de comissionamento.</p>
+  </td></tr>
+  <tr><td class="secao" style="width:30%">Motivação e relevância</td>
+      <td>A inspeção manual é lenta, cara e sujeita à fadiga do inspetor, e produtos defeituosos chegam ao cliente final. A inspeção automática embarcada verifica 100% das peças com velocidade, precisão e rastreabilidade, reduzindo desperdício, retrabalho e devoluções, alinhada aos princípios da Indústria 4.0 e ao controle estatístico de qualidade (CEP/SPC).</td></tr>
+  <tr><td class="secao">Descrição do problema</td>
+      <td>Latas passam por uma esteira em velocidade constante, e os defeitos precisam ser identificados antes do empacotamento. O sistema deve capturar imagens das latas em movimento, executar a inferência com um modelo de detecção de defeitos (lata boa, amassada, sem rótulo e sem cor), sinalizar as reprovadas por saída digital (GPIO ou relé) e registrar imagens anotadas das não conformidades.</td></tr>
+  <tr><td class="secao">Características do ambiente</td>
+      <td>Fábrica com ruído e vibração da esteira · variação de iluminação · reflexo e brilho nas superfícies metálicas das latas · velocidade da esteira entre 0,1 e 0,5 m/s · temperatura entre 18 °C e 35 °C · hardware embarcado sem GPU dedicada (Raspberry Pi 5).</td></tr>
+  <tr><td class="secao">O que a dupla deve entregar</td>
+      <td>
+        1. O sistema de inspeção em execução no container, respondendo pela API.<br>
+        2. A classificação de imagens reais da esteira em conformes e não conformes, com a leitura de classe e confiança.<br>
+        3. A medição de latência do modelo e a comparação com a velocidade da linha.<br>
+        4. A <b>ficha de decisão técnica</b>: limiar de confiança escolhido, erros observados e parecer "aprovo / não aprovo para a linha", com justificativa.
+      </td></tr>
+  <tr><td class="secao">Aplicabilidade</td>
+      <td>Autopeças e componentes eletrônicos · alimentos e bebidas embalados · dispositivos médicos · vidro plano e cerâmica · eletrodomésticos · gráficas e embalagens · indústria farmacêutica.</td></tr>
+</table>
 
-<h2>8. Próximos passos na trilha</h2>
-<ul>
-  <li><b>Próxima aula:</b> criar o próprio dataset (captura de vídeo, anotação e treino do YOLO).</li>
-  <li><b>Desafio opcional:</b> enviar um alerta MQTT a cada lata reprovada; ou exportar o modelo em INT8 e medir o ganho de latência e a perda de precisão.</li>
-  <li><b>Leitura complementar:</b> guia Ultralytics para Raspberry Pi e documentação de exportação de modelos.</li>
-</ul>
+<table class="moldura">
+  <tr><td colspan="2" class="rotulo centro">Avaliação formativa: laboratório guiado em degraus</td></tr>
+  <tr><td class="secao" style="width:30%">Contexto</td>
+      <td>Antes de decidir, a equipe precisa conhecer o protótipo. Em dupla (piloto e navegador), você sobe o sistema, envia imagens da esteira e mede o desempenho, avançando por degraus com um checkpoint visível ao professor ao fim de cada um.</td></tr>
+  <tr><td class="secao">Entregas (checkpoints)</td>
+      <td>Degrau 1: container no ar e serviço respondendo · Degrau 2: resposta em JSON e imagem anotada · Degrau 3: tabela de latência PyTorch × NCNN · Quizzes relâmpago 1 e 2.<br>
+          <span class="pequeno">Registro <b>F</b> (formativo) no instrumento de avaliação.</span></td></tr>
+</table>
 
-<h2>Referências</h2>
-<p class="fonte">
-ANDERSON, L. W.; KRATHWOHL, D. R. (org.). <i>A Taxonomy for Learning, Teaching, and Assessing: A Revision of Bloom's Taxonomy of Educational Objectives</i>. New York: Longman, 2001.<br>
-FREEMAN, S. et al. Active learning increases student performance in science, engineering, and mathematics. <i>PNAS</i>, v. 111, n. 23, p. 8410–8415, 2014.<br>
-MAZUR, E. <i>Peer Instruction: A User's Manual</i>. Upper Saddle River: Prentice Hall, 1997.<br>
-ULTRALYTICS. Quick Start Guide: Raspberry Pi with Ultralytics YOLO. Disponível em: docs.ultralytics.com/guides/raspberry-pi. Acesso em: 4 out. 2026.
-</p>
+<table class="moldura">
+  <tr><td colspan="2" class="rotulo centro">Avaliação somativa: ficha de decisão técnica</td></tr>
+  <tr><td class="secao" style="width:30%">Contexto</td>
+      <td>A diretoria da Refri Vale precisa de um parecer objetivo. Com 20 imagens de teste, a dupla testa os limiares de confiança 0,25, 0,5 e 0,8, conta os defeitos que passariam e as latas boas que seriam descartadas, e decide se o sistema pode ser instalado na linha.</td></tr>
+  <tr><td class="secao">Entrega</td>
+      <td>Ficha de decisão técnica preenchida e apresentada em até 1 minuto, com dados (limiar, erros e latência).<br>
+          <span class="pequeno">Registro <b>S</b> (somativo) no instrumento de avaliação.</span></td></tr>
+</table>
+
+<!-- METODOLOGIA -->
+<table class="moldura">
+  <tr><td class="rotulo">Metodologia ativa e justificativa</td></tr>
+  <tr><td>
+    <ul style="margin:0; padding-left:5mm">
+      <li><b>Aprendizagem Baseada em Projetos (PBL):</b> a aula inteira responde a um problema industrial real, com um entregável concreto: a decisão técnica da dupla sobre colocar ou não o sistema na linha.</li>
+      <li><b>Programação em pares (piloto e navegador):</b> um digita e o outro confere; os papéis trocam a cada bloco de 20 a 25 minutos.</li>
+      <li><b>Laboratório guiado em degraus:</b> cada etapa termina num checkpoint visível (container no ar, primeira resposta, tabela de latência).</li>
+      <li><b>Instrução por pares (Peer Instruction):</b> nos quizzes, cada estudante vota, discute com a dupla e vota de novo.</li>
+    </ul>
+    <p style="margin:2mm 0 0"><b>Justificativa:</b> uma meta-análise de 225 estudos em ciências e engenharia (Freeman et al., 2014) mostrou que estudantes em aulas apenas expositivas tiveram 1,5 vez mais chance de reprovação do que em aulas com aprendizagem ativa. O público tem só Python básico: ver a lata defeituosa ser identificada dá sentido aos conceitos, sem exigir matemática. As duplas equilibram turmas heterogêneas, e os erros do laboratório viram conteúdo da aula.</p>
+  </td></tr>
+</table>
+
+<!-- REQUISITOS -->
+<table class="moldura">
+  <tr><td colspan="2" class="rotulo">Requisitos técnicos e pedagógicos</td></tr>
+  <tr><td class="secao" style="width:32%">Infraestrutura (por dupla)</td><td>Computador com Docker, 8 GB de RAM, 15 GB livres, navegador e terminal; imagem <i>inspecao-latas</i> já montada; repositório do projeto clonado; 20 imagens de teste da esteira</td></tr>
+  <tr><td class="secao">Infraestrutura (sala)</td><td>Projetor; computador do professor com o mesmo ambiente; rede local (a aula funciona sem internet); kit Raspberry Pi 5 com relé ou LED no GPIO 17 para demonstração (opcional)</td></tr>
+  <tr><td class="secao">Conhecimento prévio</td><td><b>Necessário:</b> Python básico (variáveis, listas, dicionários, funções) e uso básico do terminal. <b>Não necessário:</b> matemática de redes neurais, treino de modelos, Docker avançado.</td></tr>
+  <tr><td class="secao">Nivelamento</td><td>Folha impressa de comandos; quem não usa terminal pode fazer tudo pelo navegador (Swagger)</td></tr>
+</table>
+
+<!-- RECURSOS -->
+<table class="moldura">
+  <tr><td class="rotulo">Recursos e materiais de apoio (verificar antes da aula)</td></tr>
+  <tr><td>
+    ☐ Imagem Docker montada e testada em todas as máquinas &nbsp;·&nbsp; ☐ Repositório e imagens de teste em cada máquina<br>
+    ☐ Vídeo da esteira e slides no computador do professor; projetor testado<br>
+    ☐ Folhas impressas: comandos, instrumento de avaliação e ficha de decisão da dupla<br>
+    ☐ Quizzes 1 e 2 prontos (cartões A/B/C/D ou formulário) &nbsp;·&nbsp; ☐ Máquina reserva e gravação da demonstração (plano B)<br>
+    ☐ (Opcional) Kit Raspberry Pi 5 montado
+  </td></tr>
+</table>
+
+<!-- INSTRUMENTO DE REGISTRO DE AVALIAÇÃO -->
+<h3 class="quebra centro" style="text-decoration:underline; font-size:11pt; margin:0 0 3mm">INSTRUMENTO DE REGISTRO DE AVALIAÇÃO</h3>
+<table class="aval" style="table-layout:fixed">
+  <colgroup><col style="width:7mm"><col style="width:27%"><col><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"><col style="width:6mm"></colgroup>
+  <tr>
+    <th rowspan="2" class="natureza" style="font-size:8pt">Natureza dos critérios</th>
+    <th rowspan="2" style="text-align:center; vertical-align:middle">Fundamentos técnicos e científicos ou capacidades técnicas</th>
+    <th rowspan="2" colspan="2" style="text-align:center">Critérios de avaliação
+      <table class="legenda" style="width:auto; margin:1.5mm auto 0">
+        <tr><td style="background:#c00000; width:8mm"></td><td>Crítico</td><td style="background:#2f5597; width:8mm"></td><td>Desejável</td></tr>
+        <tr><td>0</td><td>NÃO atingiu</td><td>1</td><td>Atingiu</td></tr>
+        <tr><td>F</td><td>Formativa</td><td>S</td><td>Somativa</td></tr>
+      </table>
+    </th>
+    <th colspan="8" class="centro">Alunos</th>
+  </tr>
+  <tr><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td></tr>
+  <!-- COMPETÊNCIAS TÉCNICAS -->
+  <tr><td rowspan="34" class="natureza">Competências técnicas</td>
+      <td rowspan="4">1. Identificar os elementos de uma detecção: caixa, classe e confiança</td>
+      <td rowspan="2" class="critico">Identificou caixa, classe e confiança na resposta do modelo</td><td class="fs">F</td>
+      <td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Relacionou a cor de cada caixa à classe da lata</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="2">2. Descrever as etapas de criação e operação do sistema de inspeção</td>
+      <td rowspan="2" class="desejavel">Descreveu na ordem o ciclo: captura, anotação, treino, exportação e operação na linha</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="4">3. Explicar as vantagens do processamento na borda em relação à nuvem</td>
+      <td rowspan="2" class="critico">Explicou ao menos duas vantagens da borda para a linha de produção</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Citou uma limitação do hardware embarcado</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="4">4. Preparar o ambiente de execução em container Docker</td>
+      <td rowspan="2" class="critico">Executou o container e obteve resposta do serviço (/saude)</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Explicou a função da porta exposta e do reinício automático</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="6">5. Utilizar API HTTP de inferência com retorno em JSON e em imagem anotada</td>
+      <td rowspan="2" class="critico">Obteve a resposta em JSON do endpoint de detecção</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="critico">Obteve a imagem anotada do endpoint de imagem</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Provocou e interpretou um erro (arquivo inválido, HTTP 400)</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="4">6. Interpretar os resultados para classificar peças como conformes ou não conformes</td>
+      <td rowspan="2" class="critico">Classificou corretamente as latas conformes e não conformes de uma imagem</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Identificou um falso positivo ou um falso negativo</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="4">7. Comparar o desempenho do modelo em diferentes formatos de inferência</td>
+      <td rowspan="2" class="critico">Mediu a latência do modelo em PyTorch e em NCNN</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Explicou por que o resultado no PC difere do resultado na Raspberry Pi 5</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="4">8. Avaliar a viabilidade de operação em tempo real no hardware embarcado</td>
+      <td rowspan="2" class="critico">Relacionou a latência medida com o intervalo entre as latas na esteira</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2" class="desejavel">Escolheu e justificou o limiar de confiança considerando o custo dos erros</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+  <tr><td rowspan="2">9. Propor melhorias para a solução embarcada</td>
+      <td rowspan="2" class="desejavel">Propôs uma melhoria viável (quantização, alerta MQTT ou nova classe)</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <!-- CAPACIDADES SOCIAIS -->
+  <tr><td rowspan="12" class="natureza">Capacidades sociais</td>
+      <td rowspan="2">1. Demonstrar atenção a detalhes</td>
+      <td rowspan="2" class="desejavel">Conferiu os resultados antes de registrar a decisão da dupla</td><td class="fs">F</td>
+      <td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td><td class="aluno"></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2">2. Demonstrar capacidade de comunicação</td><td rowspan="2" class="desejavel">Apresentou a decisão da dupla em até 1 minuto, apoiada em dados</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2">3. Demonstrar capacidade de organização</td><td rowspan="2" class="desejavel">Registrou as medições na ficha de decisão de forma organizada</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2">4. Demonstrar raciocínio lógico e seguir método de trabalho</td><td rowspan="2" class="desejavel">Seguiu os degraus na ordem, validando cada checkpoint</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2">5. Demonstrar visão sistêmica</td><td rowspan="2" class="desejavel">Relacionou modelo, hardware e linha de produção na decisão</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td rowspan="2">6. Trabalhar em equipe</td><td rowspan="2" class="desejavel">Alternou os papéis de piloto e navegador e apoiou a dupla vizinha</td><td class="fs">F</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td class="fs">S</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td colspan="3" class="rotulo" style="text-align:right">Nível de desempenho</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td colspan="3" class="rotulo" style="text-align:right">Nota</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p class="pequeno">Total: <b class="critico">8 critérios críticos</b> (capacidades técnicas) e <b class="desejavel">15 critérios desejáveis</b> (9 técnicos e 6 sociais). F = registro formativo durante a aula (quizzes e checkpoints); S = registro somativo na entrega da ficha de decisão.</p>
+
+<!-- NÍVEIS DE DESEMPENHO -->
+<table style="width:70%; margin:4mm auto">
+  <tr><th colspan="3" class="centro rotulo">Níveis de desempenho</th></tr>
+  <tr><th>Níveis</th><th class="centro">Nota</th><th class="centro">%</th></tr>
+  <tr><td>Atendeu todos os 8 críticos e todos os 15 desejáveis</td><td class="centro">10</td><td class="centro">100</td></tr>
+  <tr><td>Atendeu todos os críticos e 13 a 14 desejáveis</td><td class="centro">9</td><td class="centro">90</td></tr>
+  <tr><td>Atendeu todos os críticos e 11 a 12 desejáveis</td><td class="centro">8</td><td class="centro">80</td></tr>
+  <tr><td>Atendeu todos os críticos e 9 a 10 desejáveis</td><td class="centro">7</td><td class="centro">70</td></tr>
+  <tr><td>Atendeu todos os críticos e 7 a 8 desejáveis</td><td class="centro">6</td><td class="centro">60</td></tr>
+  <tr><td>Atendeu todos os críticos e até 6 desejáveis</td><td class="centro">5</td><td class="centro">50</td></tr>
+  <tr><td>Atendeu 7 críticos e qualquer quantidade de desejáveis</td><td class="centro">4</td><td class="centro">40</td></tr>
+  <tr><td>Atendeu 5 a 6 críticos</td><td class="centro">3</td><td class="centro">30</td></tr>
+  <tr><td>Atendeu 3 a 4 críticos</td><td class="centro">2</td><td class="centro">20</td></tr>
+  <tr><td>Atendeu 1 a 2 críticos</td><td class="centro">1</td><td class="centro">10</td></tr>
+  <tr><td>Não atendeu nenhum critério crítico</td><td class="centro">0</td><td class="centro">0</td></tr>
+  <tr><td class="rotulo">Nível mínimo de desempenho esperado</td><td colspan="2" class="centro"><b>5</b></td></tr>
+</table>
+
+<!-- PLANO DE AULA: ESTRATÉGIA -->
+<h3 class="quebra centro" style="font-size:11pt; margin:0 0 3mm">PLANO DE AULA (Estratégia de ensino e aprendizagem) – Sequência didática</h3>
+<table>
+  <tr><th style="width:11%">Tempo</th><th style="width:25%">Conhecimentos</th><th style="width:32%">Estratégias</th><th>Mediação (perguntas mediadoras)</th></tr>
+  <tr><td>0–15 min</td><td>Apresentação da aula e do problema real da linha de produção</td><td>Vídeo da esteira com latas defeituosas; apresentação dos objetivos; formação das duplas e dos papéis</td><td>Quantas latas com defeito vocês viram? Por que um inspetor humano falha nessa tarefa?</td></tr>
+  <tr><td>15–35 min</td><td>1 Visão computacional · 2 Ciclo do modelo · 3.1–3.2 Edge AI</td><td>Exposição dialogada curta com projetor; visão geral do ciclo do modelo em uma figura; Quiz relâmpago 1 (Peer Instruction)</td><td>O que o modelo devolve para cada lata? Por que não mandar as imagens para a nuvem?</td></tr>
+  <tr><td>35–55 min</td><td>5 Containerização</td><td>Hands-on, Degrau 1: subir o container e conferir o serviço; leitura guiada do Dockerfile</td><td>O que é uma imagem e o que é um container? Por que o sistema precisa voltar sozinho após uma queda?</td></tr>
+  <tr><td>55–80 min</td><td>6 Inferência por API HTTP</td><td>Hands-on, Degrau 2: enviar imagens aos endpoints de JSON e de imagem anotada; troca de papéis na dupla</td><td>Como ler classe, confiança e caixa no JSON? O que acontece se enviarmos um arquivo que não é imagem?</td></tr>
+  <tr><td>80–90 min</td><td colspan="3" class="centro">Intervalo</td></tr>
+  <tr><td>90–115 min</td><td>3.3–3.4 Hardware e formatos · 7.1–7.2 Desempenho</td><td>Hands-on, Degrau 3: benchmark PyTorch × NCNN; comparação com a referência da Raspberry Pi 5; Quiz relâmpago 2</td><td>Por que o mesmo modelo tem velocidades diferentes? O resultado do notebook vale para a placa?</td></tr>
+  <tr><td>115–145 min</td><td>1.3 Confiança e limiar · 7.3 Custo dos erros</td><td>Desafio da dupla (PBL): testar limiares de 0,25, 0,5 e 0,8 em 20 imagens e preencher a ficha de decisão</td><td>Qual erro custa mais caro para a fábrica: deixar passar defeito ou descartar lata boa?</td></tr>
+  <tr><td>145–160 min</td><td>Gestão de dificuldades</td><td>Cada dupla traz o erro que encontrou; resolução de 2 a 3 casos no projetor</td><td>Onde procurar a causa: no log, na porta, no modelo ou na imagem enviada?</td></tr>
+  <tr><td>160–175 min</td><td>4 Inspeção na linha · Síntese</td><td>Demonstração do professor: inspeção do vídeo com rastreio, linha virtual, sopro no GPIO (LED), registro em CSV e leitura do lote; retomada coletiva dos objetivos; 3 duplas apresentam a decisão em 1 minuto</td><td>Como a decisão de uma imagem vira a decisão sobre uma lata em movimento? Quais objetivos atingimos?</td></tr>
+  <tr><td>175–180 min</td><td>Próximos passos</td><td>Ticket de saída (2 perguntas); próxima aula e desafios opcionais (MQTT, INT8)</td><td>Qual frase define Edge AI? Que número do JSON você olharia primeiro para confiar numa detecção?</td></tr>
+</table>
+
+<!-- ELABORAÇÃO -->
+<table style="margin-top:6mm">
+  <tr><th class="rotulo">Elaboração</th><th class="rotulo">Data</th><th class="rotulo">Aprovação</th><th class="rotulo">Data</th></tr>
+  <tr><td>Francisco Lima</td><td>04 / 10 / 2026</td><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp; /&nbsp;&nbsp;&nbsp;&nbsp; /</td></tr>
+</table>
+
+<p class="pequeno"><b>Referências:</b> ANDERSON, L. W.; KRATHWOHL, D. R. <i>A Taxonomy for Learning, Teaching, and Assessing</i>. Longman, 2001. · FREEMAN, S. et al. Active learning increases student performance in science, engineering, and mathematics. <i>PNAS</i>, v. 111, n. 23, p. 8410–8415, 2014. · MAZUR, E. <i>Peer Instruction: A User's Manual</i>. Prentice Hall, 1997. · ULTRALYTICS. Raspberry Pi guide. docs.ultralytics.com/guides/raspberry-pi (acesso em 04/10/2026).</p>
 
 </body>
 </html>
