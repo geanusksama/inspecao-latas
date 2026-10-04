@@ -1,0 +1,23 @@
+description: Ultralytics YOLO26n model trained on d:\YOLOENTREGA\dataset\yolo\data.yaml
+author: Ultralytics
+date: '2026-10-03T23:25:09.006386-03:00'
+version: 8.4.172
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+head: Detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: lata_ok
+  1: amassada
+  2: sem_rotulo
+  3: sem_cor
+args:
+  batch: 1
+  quantize: null
+channels: 3
+end2end: false

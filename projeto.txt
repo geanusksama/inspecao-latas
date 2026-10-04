@@ -1,0 +1,18 @@
+objetivo
+
+Implementar um sistema embarcado de inspeção 
+visual baseado em visão computacional na Raspberry Pi 5 
+para detecção automatizada de defeitos superficiais 
+em produtos em uma linha de produção, classificando 
+peças como conformes ou não conformes em tempo real, 
+sem interrupção do fluxo produtivo.
+
+descrição do problem
+Linha de produção com peças ou produtos passando por 
+uma esteira a velocidade constante, onde defeitos como trincas, 
+riscos, deformações ou manchas precisam ser identificados 
+antes do empacotamento. O sistema deverá capturar imagens 
+das peças em movimento, executar inferência com modelo 
+de detecção/classificação de defeitos, sinalizar peças 
+reprovadas via saída digital (GPIO ou relay) e registrar 
+imagens anotadas de não conformidades para rastreabilidade.

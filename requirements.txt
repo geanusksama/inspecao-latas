@@ -1,0 +1,17 @@
+# Bibliotecas do projeto, nas versões testadas (Python 3.14).
+#
+# 1) ANTES deste arquivo, instale o PyTorch COM CUDA (torch e torchvision da mesma build):
+#      pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cu130
+#    No Windows, se o ultralytics for instalado primeiro, ele traz um torch só para CPU.
+#
+# 2) Depois:
+#      pip install -r requirements.txt
+
+ultralytics==8.4.172       # YOLO26: treino, detecção e rastreio (traz numpy, pillow, matplotlib, pyyaml, polars)
+opencv-python==5.0.0.93    # vídeo, desenho e janelas (NÃO use opencv-python-headless: não abre janelas)
+lap==0.5.13                # usado pelo rastreador (ByteTrack) para ligar as caixas entre quadros
+rapidocr==3.9.2            # OCR que lê o lote (só o 7_ler_lotes.py usa)
+onnxruntime==1.30.0        # motor que roda os modelos do RapidOCR
+
+# 3) Só na Raspberry Pi (controle do pino do soprador):
+#      pip install gpiozero

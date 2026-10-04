@@ -1,0 +1,16 @@
+# Ambiente Python (recriado com: python -m venv venv + requirements.txt)
+venv/
+__pycache__/
+
+# Curso (não faz parte do projeto entregue)
+curso/
+
+# Versão da Raspberry: tem repositório próprio (inspecao-latas-raspberry), gerado pelo 8_gerar_raspberry.py
+raspberry/
+
+# Resultados da inspeção e arquivos que os scripts recriam
+saida/
+dataset/yolo/
+
+# Modelo pré-treinado: o Ultralytics baixa sozinho quando falta
+yolo26n.pt
